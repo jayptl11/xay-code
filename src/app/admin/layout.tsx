@@ -1,5 +1,6 @@
 import { Portal } from "@/components/navigation";
 import { requireUser } from "@/lib/access";
+import "../portal.css";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser("admin");
