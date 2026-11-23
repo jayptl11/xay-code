@@ -1,0 +1,381 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id              String   @id
+  name            String
+  email           String   @unique
+  emailVerified   Boolean  @default(false)
+  image           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  role            String   @default("affiliate")
+  banned          Boolean? @default(false)
+  banReason       String?
+  banExpires      DateTime?
+  phone           String?
+  affiliateCode   String?  @unique
+  mustChange      Boolean  @default(false)
+  bankDetails     String?
+  pendingBank     String?
+  sessions        Session[]
+  accounts        Account[]
+  requests        ProjectRequest[]
+  commissions     Commission[]
+  payouts         Payout[]
+  acceptances     PolicyAcceptance[]
+  notices         Notice[]
+}
+
+model Session {
+  id             String   @id
+  expiresAt      DateTime
+  token          String   @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  impersonatedBy String?
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+}
+
+model Settings {
+  id            Int      @id @default(1)
+  commissionBps Int?
+  contactEmail  String?
+  zalo          String?
+  process       String?
+  updatedAt     DateTime @updatedAt
+}
+
+model Policy {
+  version     Int                @id @default(autoincrement())
+  body        String
+  createdAt   DateTime           @default(now())
+  acceptances PolicyAcceptance[]
+}
+
+model PolicyAcceptance {
+  userId     String
+  version    Int
+  acceptedAt DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
+  policy     Policy   @relation(fields: [version], references: [version])
+
+  @@id([userId, version])
+}
+
+enum ContentType {
+  SERVICE
+  PORTFOLIO
+}
+
+model Content {
+  id          String      @id @default(cuid())
+  type        ContentType
+  title       String
+  description String
+  stack       String?
+  imageUrl    String?
+  demoUrl     String?
+  published   Boolean     @default(false)
+  consent     Boolean     @default(false)
+  position    Int         @default(0)
+}
+
+model Customer {
+  id          String             @id @default(cuid())
+  identities  CustomerIdentity[]
+  requests    ProjectRequest[]
+  projects    Project[]
+}
+
+model CustomerIdentity {
+  key        String   @id
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+}
+
+enum RequestSource {
+  DIRECT
+  LINK
+  AFFILIATE
+}
+
+enum RequestStatus {
+  NEW
+  DISCUSSING
+  QUOTED
+  ACCEPTED
+  CLOSED
+}
+
+model ProjectRequest {
+  id            String        @id @default(cuid())
+  number        Int           @unique @default(autoincrement())
+  customerId    String
+  customer      Customer      @relation(fields: [customerId], references: [id])
+  name          String
+  email         String?
+  phone         String?
+  company       String?
+  category      String
+  title         String
+  description   String
+  timeline      String?
+  budget        String?
+  preliminary   String?
+  links         String?
+  submittedNote String?
+  internalNote  String?
+  source        RequestSource
+  affiliateId   String?
+  affiliate     User?         @relation(fields: [affiliateId], references: [id])
+  referralCode  String?
+  consentAt     DateTime      @default(now())
+  submissionKey String?
+  extendedUntil DateTime?
+  extendReason  String?
+  createdAt     DateTime      @default(now())
+  status        RequestStatus @default(NEW)
+  closeReason   String?
+  quotes        Quote[]
+  project       Project?
+
+  @@index([customerId, createdAt])
+  @@index([affiliateId, createdAt])
+  @@index([submissionKey, createdAt])
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  SUPERSEDED
+  REJECTED
+  ACCEPTED
+}
+
+model Quote {
+  id             String          @id @default(cuid())
+  requestId      String
+  request        ProjectRequest  @relation(fields: [requestId], references: [id])
+  version        Int
+  scope          String
+  deliverables   String
+  price          BigInt
+  schedule       Json
+  startsOn       String
+  dueOn          String
+  warranty       String
+  hosting        String
+  allowEarlyDelivery Boolean @default(false)
+  terms          String?
+  status         QuoteStatus     @default(DRAFT)
+  sentAt         DateTime?
+  acceptedAt     DateTime?
+  evidence       String?
+  createdAt      DateTime        @default(now())
+  project        Project?
+
+  @@unique([requestId, version])
+}
+
+enum ProjectStatus {
+  DEPOSIT
+  ACTIVE
+  REVIEW
+  DELIVERED
+  COMPLETE
+  CANCELLED
+}
+
+model Project {
+  id              String         @id @default(cuid())
+  number          Int            @unique @default(autoincrement())
+  requestId       String         @unique
+  request         ProjectRequest @relation(fields: [requestId], references: [id])
+  quoteId         String         @unique
+  quote           Quote          @relation(fields: [quoteId], references: [id])
+  customerId      String
+  customer        Customer       @relation(fields: [customerId], references: [id])
+  createdAt       DateTime       @default(now())
+  status          ProjectStatus  @default(DEPOSIT)
+  deliveredAt     DateTime?
+  completedAt     DateTime?
+  cancellation    String?
+  deliveryProof   String?
+  acceptanceProof String?
+  sharedNote      String?
+  internalNote    String?
+  documents       String?
+  demo            String?
+  repository      String?
+  tasks           ProjectTask[]
+  extras          ExtraQuote[]
+  movements       MoneyMovement[]
+  commission      Commission?
+
+  @@index([customerId])
+}
+
+model ProjectTask {
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+  title     String
+  done      Boolean @default(false)
+  createdAt DateTime @default(now())
+}
+
+model ExtraQuote {
+  id         String    @id @default(cuid())
+  projectId  String
+  project    Project   @relation(fields: [projectId], references: [id])
+  scope      String
+  price      BigInt
+  eligible   Boolean
+  createdAt  DateTime  @default(now())
+  acceptedAt DateTime?
+  evidence   String?
+}
+
+enum MovementType {
+  RECEIPT
+  REFUND
+}
+
+enum MoneyGroup {
+  DEVELOPMENT
+  HOSTING
+}
+
+model MoneyMovement {
+  id          String       @id @default(cuid())
+  projectId   String
+  project     Project      @relation(fields: [projectId], references: [id])
+  type        MovementType
+  group       MoneyGroup
+  amount      BigInt
+  occurredOn  String
+  label       String
+  evidence    String?
+  note        String?
+  voidedAt    DateTime?
+  voidReason  String?
+  createdAt   DateTime     @default(now())
+
+  @@index([projectId, voidedAt])
+}
+
+model Commission {
+  id           String              @id @default(cuid())
+  projectId    String              @unique
+  project      Project             @relation(fields: [projectId], references: [id])
+  customerId   String              @unique
+  affiliateId  String
+  affiliate    User                @relation(fields: [affiliateId], references: [id])
+  sourceId     String
+  rateBps      Int
+  base         BigInt
+  original     BigInt
+  holdReason   String?
+  lines        PayoutLine[]
+  adjustments  CommissionAdjustment[]
+
+  @@index([affiliateId])
+}
+
+model CommissionAdjustment {
+  id           String     @id @default(cuid())
+  commissionId String
+  commission   Commission @relation(fields: [commissionId], references: [id])
+  reduction    BigInt
+  reason       String
+  createdAt    DateTime   @default(now())
+}
+
+model Payout {
+  id          String       @id @default(cuid())
+  affiliateId String
+  affiliate   User         @relation(fields: [affiliateId], references: [id])
+  reference   String       @unique
+  occurredOn  String
+  amount      BigInt
+  recipient   String
+  evidence    String?
+  voidedAt    DateTime?
+  voidReason  String?
+  createdAt   DateTime     @default(now())
+  lines       PayoutLine[]
+}
+
+model PayoutLine {
+  payoutId     String
+  commissionId String
+  amount       BigInt
+  payout       Payout     @relation(fields: [payoutId], references: [id])
+  commission   Commission @relation(fields: [commissionId], references: [id])
+
+  @@id([payoutId, commissionId])
+  @@index([commissionId])
+}
+
+model Audit {
+  id        String   @id @default(cuid())
+  actorId   String
+  subjectId String
+  event     String
+  detail    String?
+  createdAt DateTime @default(now())
+}
+
+model Notice {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  message   String
+  href      String
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}

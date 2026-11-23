@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 120" width="140" height="120" color="#FF6B2C">
+  <title>Xây Code — tháp gạch dưới ký hiệu code</title>
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="currentColor" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="currentColor" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="140" height="120" rx="18" fill="#0B0F1A"/>
+  <circle cx="70" cy="56" r="46" fill="url(#glow)"/>
+  <g fill="#E8ECF4">
+    <rect x="18" y="88" width="32" height="16" rx="3"/>
+    <rect x="54" y="88" width="32" height="16" rx="3"/>
+    <rect x="90" y="88" width="32" height="16" rx="3"/>
+  </g>
+  <g fill="#9AA8C7">
+    <rect x="36" y="68" width="32" height="16" rx="3"/>
+    <rect x="72" y="68" width="32" height="16" rx="3"/>
+  </g>
+  <rect x="54" y="48" width="32" height="16" rx="3" fill="currentColor"/>
+  <g fill="none" stroke="#7F8FB0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="28,46 14,60 28,74"/>
+    <polyline points="112,46 126,60 112,74"/>
+  </g>
+</svg>
