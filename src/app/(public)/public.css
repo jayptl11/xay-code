@@ -20,6 +20,7 @@
 .public-shell main { flex: 1; scroll-margin-top: 85px; }
 .public-shell :focus-visible { outline-color: var(--link); }
 .public-shell .text-link { color: var(--link); }
+.public-shell .button.secondary:hover { color: var(--ink); }
 .public-skip { position: absolute; top: 12px; left: 12px; z-index: 10; padding: 10px 14px; background: white; transform: translateY(-160%); }
 .public-skip:focus { transform: translateY(0); }
 
@@ -290,7 +291,9 @@
 .public-project-empty { padding: 10px 20px; border: 1px dashed #f8f0e166; border-radius: var(--corner); }
 .public-project-empty .empty { color: #e3e5e8; }
 .public-shell .card { border-radius: 7px; }
-.public-projects .card { overflow-wrap: anywhere; background: #fbf7ee; color: var(--ink); }
+.public-projects .card { overflow-wrap: anywhere; background: #fbf7ee; color: var(--ink); box-shadow: 0 1px 0 #fff inset, 0 12px 28px -24px #17202659; transition: transform 180ms var(--ease), box-shadow 180ms ease, border-color 180ms ease; }
+.public-projects .card:hover { transform: translateY(-3px); border-color: var(--ink); box-shadow: 4px 5px 0 #1720262b; }
+@media (prefers-reduced-motion: reduce) { .public-projects .card:hover { transform: none; } }
 .public-projects .portfolio-image { border-radius: var(--corner); }
 .public-process-section { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: clamp(26px, 6.3vw, 90px); align-items: start; }
 .public-process-section .public-section-heading { display: block; margin: 0; position: sticky; top: 114px; }
@@ -333,9 +336,11 @@
 .public-shell .public-contact .button.primary { background: #f4e9d5; border-color: #f4e9d5; color: var(--ink); }
 .public-shell .public-contact .button.primary:hover { background: #fff; border-color: #fff; }
 .public-contact-actions a:not(.button) { color: #c4d4e4; text-decoration: underline; text-underline-offset: 4px; overflow-wrap: anywhere; }
-.public-footer { border-top: 1px solid #282c37; padding-block: 22px; background: var(--ink); color: #d6d8e0; }
+.public-footer { border-top: 1px solid #282c37; padding-block: 26px; background: var(--ink); color: #d6d8e0; }
 .public-footer .public-container { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px; }
-.public-footer a:hover { color: #fff; }
+.public-footer-brand { font-weight: 700; letter-spacing: -.01em; color: #f6efe1; }
+.public-footer a { text-decoration: underline; text-underline-offset: 4px; text-decoration-color: #6d7a86; }
+.public-footer a:hover { color: #fff; text-decoration-color: currentColor; }
 
 .public-form-page { margin-block: clamp(34px, 6vw, 74px); }
 .public-form-page .page-title h1 { font-size: clamp(32px, 5vw, 52px); }

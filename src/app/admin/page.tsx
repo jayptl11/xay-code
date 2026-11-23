@@ -41,7 +41,7 @@ export default async function AdminHome() {
     <div className="grid-4">{[
       ["Yêu cầu mới", fresh, "/admin/yeu-cau"], ["Báo giá chờ phản hồi", awaiting, "/admin/yeu-cau"],
       ["Dự án đang theo dõi", active.length, "/admin/du-an"], ["Hoa hồng chờ trả", money(payable), "/admin/hoa-hong"],
-    ].map(([label, val, href]) => <Card key={href + String(label)}><Link href={String(href)}><span className="muted">{label}</span><strong className="summary-number">{val}</strong></Link></Card>)}</div>
+    ].map(([label, val, href]) => <Card key={href + String(label)} className="summary-tile"><Link href={String(href)}><span className="muted">{label}</span><strong className="summary-number">{val}</strong></Link></Card>)}</div>
     <div className="grid-2">
       <Card title="Hạn dự án và các khoản thu">
         <p>Thực thu tháng này <strong>{money(monthNet)}</strong></p>

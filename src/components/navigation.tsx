@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { CircleUserRound, FileText, FolderKanban, LayoutDashboard, LogOut, Settings, Users, Wallet } from "lucide-react";
+import { clsx } from "clsx";
 import { signOut } from "@/lib/auth-actions";
 import { MobilePublicMenu } from "./public-interactions";
 
@@ -35,21 +37,28 @@ const adminLinks = [
   ["/admin/hoa-hong", "Hoa hồng", Wallet], ["/admin/cai-dat", "Cài đặt", Settings],
 ] as const;
 
+const affiliateLinks = [
+  ["/affiliate", "Tổng quan", LayoutDashboard],
+  ["/affiliate/gui-yeu-cau", "Gửi yêu cầu", FileText],
+  ["/affiliate/tai-khoan", "Tài khoản", CircleUserRound],
+] as const;
+
 export function Portal({ role, name, children }: { role: "admin" | "affiliate"; name: string; children: React.ReactNode }) {
+  const pathname = usePathname();
+  const links = (role === "admin" ? adminLinks : affiliateLinks) as readonly (readonly [string, string, typeof LayoutDashboard])[];
+  const isCurrent = (href: string) => href === "/" + role ? pathname === "/" + role : pathname.startsWith(href);
   return <div className="portal">
     <aside className="sidebar">
       <Logo />
       <span className="sidebar-label">{role === "admin" ? "Quản trị" : "Cổng cộng tác viên"}</span>
-      <nav aria-label="Trang quản lý">{role === "admin" ? adminLinks.map(([href, label, Icon]) =>
-        <Link key={href} href={href}><Icon size={17} />{label}</Link>
-      ) : <>
-        <Link href="/affiliate"><LayoutDashboard size={17} />Tổng quan</Link>
-        <Link href="/affiliate/gui-yeu-cau"><FileText size={17} />Gửi yêu cầu</Link>
-        <Link href="/affiliate/tai-khoan"><CircleUserRound size={17} />Tài khoản</Link>
-      </>}</nav>
+      <nav aria-label="Trang quản lý">{links.map(([href, label, Icon]) =>
+        <Link key={href} href={href} className={clsx(isCurrent(href) && "active")} aria-current={isCurrent(href) ? "page" : undefined}>
+          <Icon size={17} aria-hidden />{label}
+        </Link>
+      )}</nav>
       <div className="sidebar-account"><span>{name}</span><form action={signOut}><button title="Đăng xuất" aria-label="Đăng xuất"><LogOut size={19} /></button></form></div>
     </aside>
-    <main className="workspace">{children}</main>
+    <main className="workspace" id="noi-dung">{children}</main>
   </div>;
 }
 

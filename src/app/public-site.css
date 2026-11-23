@@ -1,0 +1,22 @@
+/* Bổ trợ cho public.css — trang công khai dùng chung ngôn ngữ thiết kế với cổng quản trị. */
+
+/* Trang đăng nhập / đổi mật khẩu: bỏ nền xanh lá cũ, theo tông giấy ấm + serif. */
+.public-shell .public-form-page {
+  --ink: #172026;
+  --muted: #51534e;
+  --line: #c4bcae;
+  --paper: #f4efe4;
+}
+.public-shell .public-form-page main.narrow.login,
+.public-shell .narrow.login {
+  background-color: var(--paper);
+  background-image: radial-gradient(#9d865c1f 1px, transparent 1px);
+  background-size: 22px 22px;
+  min-height: calc(100vh - 78px);
+  font-family: "Be Vietnam Pro", "Segoe UI", sans-serif;
+}
+.public-shell .narrow.login .page-title h1 {
+  font-family: Georgia, "Times New Roman", "Be Vietnam Pro", serif;
+  letter-spacing: -.012em;
+}
+.public-shell .narrow.login .card { padding: clamp(18px, 5vw, 30px); }

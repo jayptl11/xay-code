@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./public-site.css";
 
 export const metadata: Metadata = {
   title: { default: "Xây Code — Dịch vụ lập trình theo yêu cầu", template: "%s | Xây Code" },
